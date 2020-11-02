@@ -29,6 +29,12 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
+type Node struct {
+	Val  *TreeNode
+	pre  *Node
+	next *Node
+}
+
 func findPathSum(root *TreeNode, sum int) bool {
 	if root == nil {
 		return false
@@ -78,6 +84,117 @@ func walk(root *TreeNode, sum int, temp1 []int) [][]int {
 	return r
 }
 
+/*
+ * 二叉树前序遍历   根-> 左-> 右
+ * @param node    二叉树节点
+ */
+
+func preOrderTraveral(node *TreeNode) {
+	if node == nil {
+		return
+	}
+	fmt.Printf("%d ", node.Val)
+	preOrderTraveral(node.Left)
+	preOrderTraveral(node.Right)
+}
+
+/*
+ * 二叉树中序遍历    左-> 根->右
+ * @param node    二叉树节点
+ */
+
+func inOrderTraveral(node *TreeNode) {
+	if node == nil {
+		return
+	}
+	preOrderTraveral(node.Left)
+	fmt.Printf("%d ", node.Val)
+	preOrderTraveral(node.Right)
+}
+
+/*
+ * 二叉树后序遍历    左->右-> 根
+ * @param node    二叉树节点
+ */
+
+func postOrderTraveral(node *TreeNode) {
+	if node == nil {
+		return
+	}
+	preOrderTraveral(node.Left)
+	preOrderTraveral(node.Right)
+	fmt.Printf("%d ", node.Val)
+}
+
+//Queue 队列
+type Queue struct {
+	top    *Node
+	rear   *Node
+	length int
+}
+
+// Create a new queue
+func NewQueue() *Queue {
+	return &Queue{nil, nil, 0}
+}
+
+//入队操作
+func (this *Queue) Push(treeNode *TreeNode) {
+	n := &Node{treeNode, nil, nil}
+	if this.length == 0 {
+		this.top = n
+		this.rear = this.top
+	} else {
+		n.pre = this.rear
+		this.rear.next = n
+		this.rear = n
+	}
+	this.length++
+}
+
+//出队操作
+func (this *Queue) Pop() *TreeNode {
+	if this.length == 0 {
+		return nil
+	}
+	n := this.top
+	if this.top.next == nil {
+		this.top = nil
+	} else {
+		this.top = this.top.next
+		this.top.pre.next = nil
+		this.top.pre = nil
+	}
+	this.length--
+	return n.Val
+}
+
+/*
+首先申请一个新的队列，记为queue；
+将头结点head压入queue中；
+每次从queue中出队，记为node，然后打印node值，如果node左孩子不为空，则将左孩子入队；如果node的右孩子不为空，则将右孩子入队；
+重复步骤3，直到queue为空。
+*/
+
+func levelOrderTraveral(node *TreeNode) {
+	queue := NewQueue()
+	queue.Push(node)
+	for {
+		if queue.length == 0 {
+			break
+		} else {
+			root := queue.Pop()
+			fmt.Println(root.Val)
+			if root.Left != nil {
+				queue.Push(root.Left)
+			}
+			if root.Right != nil {
+				queue.Push(root.Right)
+			}
+		}
+
+	}
+}
 func main() {
 
 	node9 := &TreeNode{
@@ -135,5 +252,12 @@ func main() {
 	}
 
 	//fmt.Println(findPathSum(node1,22))
-	fmt.Println(findSumWayPath(node1, 22))
+	//fmt.Println(findSumWayPath(node1, 22))
+	preOrderTraveral(node1)
+	fmt.Println()
+	inOrderTraveral(node1)
+	fmt.Println()
+	postOrderTraveral(node1)
+	fmt.Println()
+	levelOrderTraveral(node1)
 }
